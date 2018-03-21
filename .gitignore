@@ -1,0 +1,7 @@
+.DS_Store
+jsconfig.json
+.vscode
+typings
+node_modules
+*.zip
+xcuserdata
