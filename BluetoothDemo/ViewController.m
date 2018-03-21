@@ -67,7 +67,15 @@
 }
 
 -(void)handlePeripheralInfo:(CBPeripheral *)peripheral {
-    NSLog(@"services:%@", peripheral.services);}
+    NSLog(@"services:%@", peripheral.services);
+    
+//    NSArray <CBUUID *>* uuids = [peripheral.services valueForKey:@"UUID"];
+    
+    for (CBService *service in peripheral.services) {
+        NSLog(@"service:%@", service);
+        [peripheral discoverCharacteristics:@[service.UUID] forService:service];
+    }
+}
 
 #pragma mark - UITableViewDelegate, UITableViewDataSource
 
@@ -250,14 +258,22 @@
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error {
     NSLog(@"%s, line = %d", __FUNCTION__, __LINE__);
     
-    for (CBCharacteristic *cha in service.characteristics) {
-        //        NSLog(@"%s, line = %d, char = %@", __FUNCTION__, __LINE__, cha);
-        NSLog(@"CBCharacteristic:%@", cha);
+    if (service.characteristics.count==0) {
+        NSLog(@"There is no characteristics in service: %@", service);
+    }
+    else {
+        for (CBCharacteristic *cha in service.characteristics) {
+            //        NSLog(@"%s, line = %d, char = %@", __FUNCTION__, __LINE__, cha);
+            NSLog(@"CBCharacteristic:%@", cha);
+        }
     }
 }
 // 更新特征的value的时候会调用 （凡是从蓝牙传过来的数据都要经过这个回调，简单的说这个方法就是你拿数据的唯一方法） 你可以判断是否
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error {
-    NSLog(@"characteristic: %s, line = %d", __FUNCTION__, __LINE__);
+    NSLog(@"%s, line = %d", __FUNCTION__, __LINE__);
+    
+    NSLog(@"didUpdateValueForCharacteristic:%@", characteristic);
+    
     if ([characteristic  isEqual: @"你要的特征的UUID或者是你已经找到的特征"]) {
         //characteristic.value就是你要的数据
     }
@@ -277,5 +293,9 @@
     [self handlePeripheralInfo:peripheral];
 }
 
+-(void)peripheral:(CBPeripheral *)peripheral didDiscoverIncludedServicesForService:(CBService *)service error:(NSError *)error {
+    NSLog(@"%s, line = %d", __FUNCTION__, __LINE__);
+    NSLog(@"didDiscoverIncludedServicesForService:%@", service);
+}
 
 @end
