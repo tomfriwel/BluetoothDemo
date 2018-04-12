@@ -73,7 +73,7 @@
     
     for (CBService *service in peripheral.services) {
         NSLog(@"service:%@", service);
-        [peripheral discoverCharacteristics:@[service.UUID] forService:service];
+        [peripheral discoverCharacteristics:nil forService:service];
     }
 }
 
@@ -131,7 +131,11 @@
             [self handlePeripheralInfo:peripheral];
             break;
         case CBPeripheralStateDisconnected:
-            [self.centralManager connectPeripheral:peripheral options:nil];
+            [self.centralManager connectPeripheral:peripheral options:@{CBConnectPeripheralOptionNotifyOnDisconnectionKey:@(YES)}];
+            
+            //  设置外设的代理
+            peripheral.delegate = self;
+//            [self.centralManager connectPeripheral:peripheral options:nil];
             break;
         case CBPeripheralStateConnecting:
             break;
@@ -233,8 +237,6 @@
     NSLog(@"%s, line = %d, %@=连接成功", __FUNCTION__, __LINE__, peripheral.name);
     // 连接成功之后,可以进行服务和特征的发现
     
-    //  设置外设的代理
-    peripheral.delegate = self;
     
     // 外设发现服务,传nil代表不过滤
     // 这里会触发外设的代理方法 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error
@@ -258,13 +260,42 @@
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error {
     NSLog(@"%s, line = %d", __FUNCTION__, __LINE__);
     
-    if (service.characteristics.count==0) {
-        NSLog(@"There is no characteristics in service: %@", service);
-    }
-    else {
-        for (CBCharacteristic *cha in service.characteristics) {
-            //        NSLog(@"%s, line = %d, char = %@", __FUNCTION__, __LINE__, cha);
-            NSLog(@"CBCharacteristic:%@", cha);
+//    if (service.characteristics.count==0) {
+//        NSLog(@"There is no characteristics in service: %@", service);
+//    }
+//    else {
+//        for (CBCharacteristic *cha in service.characteristics) {
+//            //        NSLog(@"%s, line = %d, char = %@", __FUNCTION__, __LINE__, cha);
+//            NSLog(@"CBCharacteristic:%@", cha);
+//        }
+//    }
+    
+    for (CBCharacteristic *character in service.characteristics) {
+        // 这是一个枚举类型的属性
+        CBCharacteristicProperties properties = character.properties;
+        if (properties & CBCharacteristicPropertyBroadcast) {
+            //如果是广播特性
+        }
+        
+        if (properties & CBCharacteristicPropertyRead) {
+            //如果具备读特性，即可以读取特性的value
+            [peripheral readValueForCharacteristic:character];
+        }
+        
+        if (properties & CBCharacteristicPropertyWriteWithoutResponse) {
+            //如果具备写入值不需要响应的特性
+            //这里保存这个可以写的特性，便于后面往这个特性中写数据
+//            _chatacter = character;
+            NSLog(@"WriteWithoutResponse:%@", character);
+        }
+        
+        if (properties & CBCharacteristicPropertyWrite) {
+            //如果具备写入值的特性，这个应该会有一些响应
+        }
+        
+        if (properties & CBCharacteristicPropertyNotify) {
+            //如果具备通知的特性，无响应
+            [peripheral setNotifyValue:YES forCharacteristic:character];
         }
     }
 }
@@ -277,6 +308,18 @@
     if ([characteristic  isEqual: @"你要的特征的UUID或者是你已经找到的特征"]) {
         //characteristic.value就是你要的数据
     }
+    if (error) {
+        NSLog(@"错误：%@",error);
+        return;
+    }
+    
+    NSData *data = characteristic.value;
+    if (data.length <= 0) {
+        return;
+    }
+    NSString *info = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    
+    NSLog(@"info:%@",info);
 }
 
 -(void)peripheralDidUpdateName:(CBPeripheral *)peripheral {
@@ -296,6 +339,20 @@
 -(void)peripheral:(CBPeripheral *)peripheral didDiscoverIncludedServicesForService:(CBService *)service error:(NSError *)error {
     NSLog(@"%s, line = %d", __FUNCTION__, __LINE__);
     NSLog(@"didDiscoverIncludedServicesForService:%@", service);
+}
+
+- (void)peripheral:(CBPeripheral *)peripheral didUpdateNotificationStateForCharacteristic:(nonnull CBCharacteristic *)characteristic error:(nullable NSError *)error
+{
+    if (error) {
+        NSLog(@"错误didUpdateNotification：%@",error);
+        return;
+    }
+    
+    CBCharacteristicProperties properties = characteristic.properties;
+    if (properties & CBCharacteristicPropertyRead) {
+        //如果具备读特性，即可以读取特性的valueÏ
+        [peripheral readValueForCharacteristic:characteristic];
+    }
 }
 
 @end

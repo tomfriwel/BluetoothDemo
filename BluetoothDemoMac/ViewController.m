@@ -9,233 +9,128 @@
 #import "ViewController.h"
 #import <CoreBluetooth/CoreBluetooth.h>
 
-@interface ViewController()<CBPeripheralDelegate, CBCentralManagerDelegate>
+#define SERVICE_UUID @"CDD1"
+#define CHARACTERISTIC_UUID @"CDD2"
 
-@property (nonatomic, strong) CBCentralManager *centralManager;
-/* 连接到的外设 */
-@property (nonatomic, strong) CBPeripheral *peripheral;
+@interface ViewController()<CBPeripheralManagerDelegate>
 
-@property (nonatomic, strong) NSMutableArray *peripherals;
+@property (weak) IBOutlet NSTextField *textField;
+
+@property (nonatomic, strong) CBPeripheralManager *peripheralManager;
+@property (nonatomic, strong) CBMutableCharacteristic *characteristic;
 
 @end
 
 @implementation ViewController
 
--(CBCentralManager *)centralManager {
-    if (!_centralManager) {
-        _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:nil];
-    }
-    return _centralManager;
-}
-
--(NSMutableArray *)peripherals {
-    if (!_peripherals) {
-        _peripherals = [[NSMutableArray alloc] init];
-    }
-    return _peripherals;
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
-
-    // Do any additional setup after loading the view.
     
-    [self centralManager];
+    // 创建外设管理器，会回调peripheralManagerDidUpdateState方法
+    self.peripheralManager = [[CBPeripheralManager alloc] initWithDelegate:self queue:dispatch_get_main_queue()];
 }
-
 
 - (void)setRepresentedObject:(id)representedObject {
     [super setRepresentedObject:representedObject];
-
+    
     // Update the view, if already loaded.
 }
 
--(BOOL)addPeripheral:(CBPeripheral *)peripheral {
-//    if (@available(macOS 10.13, *)) {
-        if (![[self.peripherals valueForKey:@"identifier"] containsObject:peripheral.identifier]) {
-            
-            //        peripheral.delegate = self;
-            [self.peripherals addObject:peripheral];
-            return YES;
-        }
-//    } else {
-//        // Fallback on earlier versions
-//    }
-    return NO;
+#pragma mark - util
+
++(void)showAlert:(NSString *)message {
+    NSAlert *alert = [[NSAlert alloc] init];
+    [alert setMessageText:message];
+//    [alert setInformativeText:@"Informative text."];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert addButtonWithTitle:@"Ok"];
+    [alert runModal];
 }
 
+#pragma mark - methods
 
-// 需要注意的是特征的属性是否支持写数据
-- (void)yf_peripheral:(CBPeripheral *)peripheral didWriteData:(NSData *)data forCharacteristic:(nonnull CBCharacteristic *)characteristic
-{
-    /*
-     typedef NS_OPTIONS(NSUInteger, CBCharacteristicProperties) {
-     CBCharacteristicPropertyBroadcast                                                = 0x01,
-     CBCharacteristicPropertyRead                                                    = 0x02,
-     CBCharacteristicPropertyWriteWithoutResponse                                    = 0x04,
-     CBCharacteristicPropertyWrite                                                    = 0x08,
-     CBCharacteristicPropertyNotify                                                    = 0x10,
-     CBCharacteristicPropertyIndicate                                                = 0x20,
-     CBCharacteristicPropertyAuthenticatedSignedWrites                                = 0x40,
-     CBCharacteristicPropertyExtendedProperties                                        = 0x80,
-     CBCharacteristicPropertyNotifyEncryptionRequired NS_ENUM_AVAILABLE(NA, 6_0)        = 0x100,
-     CBCharacteristicPropertyIndicateEncryptionRequired NS_ENUM_AVAILABLE(NA, 6_0)    = 0x200
-     };
-     
-     打印出特征的权限(characteristic.properties),可以看到有很多种,这是一个NS_OPTIONS的枚举,可以是多个值
-     常见的又read,write,noitfy,indicate.知道这几个基本够用了,前俩是读写权限,后俩都是通知,俩不同的通知方式
-     */
-    //    NSLog(@"%s, line = %d, char.pro = %d", __FUNCTION__, __LINE__, characteristic.properties);
-    // 此时由于枚举属性是NS_OPTIONS,所以一个枚举可能对应多个类型,所以判断不能用 = ,而应该用包含&
-}
-
-#pragma mark - CBCentralManagerDelegate
-
-//只要中心管理者初始化 就会触发此代理方法 判断手机蓝牙状态
-- (void)centralManagerDidUpdateState:(CBCentralManager *)central
-{
-    switch (central.state) {
-        case 0:
-            NSLog(@"CBCentralManagerStateUnknown");
-            break;
-        case 1:
-            NSLog(@"CBCentralManagerStateResetting");
-            break;
-        case 2:
-            NSLog(@"CBCentralManagerStateUnsupported");//不支持蓝牙
-            break;
-        case 3:
-            NSLog(@"CBCentralManagerStateUnauthorized");
-            break;
-        case 4:
-        {
-            NSLog(@"CBCentralManagerStatePoweredOff");//蓝牙未开启
-        }
-            break;
-        case 5:
-        {
-            NSLog(@"CBCentralManagerStatePoweredOn");//蓝牙已开启
-            // 在中心管理者成功开启后再进行一些操作
-            // 搜索外设
-            [self.centralManager scanForPeripheralsWithServices:nil // 通过某些服务筛选外设
-                                              options:nil]; // dict,条件
-            // 搜索成功之后,会调用我们找到外设的代理方法
-            // - (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary *)advertisementData RSSI:(NSNumber *)RSSI; //找到外设
-        }
-            break;
-        default:
-            break;
+- (IBAction)sendValue:(id)sender {
+    BOOL sendSuccess = [self.peripheralManager updateValue:[self.textField.stringValue dataUsingEncoding:NSUTF8StringEncoding] forCharacteristic:self.characteristic onSubscribedCentrals:nil];
+    if (sendSuccess) {
+        NSLog(@"数据发送成功");
+    }else {
+        NSLog(@"数据发送失败");
     }
 }
-// 发现外设后调用的方法
-- (void)centralManager:(CBCentralManager *)central // 中心管理者
- didDiscoverPeripheral:(CBPeripheral *)peripheral // 外设
-     advertisementData:(NSDictionary *)advertisementData // 外设携带的数据
-                  RSSI:(NSNumber *)RSSI // 外设发出的蓝牙信号强度
-{
-//    NSLog(@"%s, line = %d, cetral = %@,peripheral = %@, advertisementData = %@, RSSI = %@", __FUNCTION__, __LINE__, central, peripheral, advertisementData, RSSI);
-//    NSLog(@"peripheral = %@", [peripheral valueForKey:@"identifier"]);
-    
-    [self addPeripheral:peripheral];
-//    NSLog(@"peripherals.count=%ld", self.peripherals.count);
-    NSLog(@"names = %@", [self.peripherals valueForKey:@"name"]);
-    NSLog(@"peripherals = %@", self.peripherals);
-    NSLog(@"services = %@",peripheral.services);
-    NSLog(@"advertisementData = %@", advertisementData);
-    
-    NSString *localName = [advertisementData objectForKey:CBAdvertisementDataLocalNameKey];
-    NSData *manufacturerData = [advertisementData objectForKey:CBAdvertisementDataManufacturerDataKey];
-    NSLog(@"Local: name: %@", localName);
-    NSLog(@"Manufact. Data: %@", [manufacturerData description]);
-    
-//    [self.centralManager connectPeripheral:peripheral options:nil];
-    
-    /*
-     peripheral = <CBPeripheral: 0x166668f0 identifier = C69010E7-EB75-E078-FFB4-421B4B951341, Name = "OBand-75", state = disconnected>, advertisementData = {
-     kCBAdvDataChannel = 38;
-     kCBAdvDataIsConnectable = 1;
-     kCBAdvDataLocalName = OBand;
-     kCBAdvDataManufacturerData = <4c69616e 0e060678 a5043853 75>;
-     kCBAdvDataServiceUUIDs =     (
-     FEE7
-     );
-     kCBAdvDataTxPowerLevel = 0;
-     }, RSSI = -55
-     根据打印结果,我们可以得到运动手环它的名字叫 OBand-75
-     
-     */
-    
-    // 需要对连接到的外设进行过滤
-    // 1.信号强度(40以上才连接, 80以上连接)
-    // 2.通过设备名(设备字符串前缀是 OBand)
-    // 在此时我们的过滤规则是:有OBand前缀并且信号强度大于35
-    // 通过打印,我们知道RSSI一般是带-的
-    
-    if ([peripheral.name hasPrefix:@"OBand"]) {
-        // 在此处对我们的 advertisementData(外设携带的广播数据) 进行一些处理
-        
-        // 通常通过过滤,我们会得到一些外设,然后将外设储存到我们的可变数组中,
-        // 这里由于附近只有1个运动手环, 所以我们先按1个外设进行处理
-        
-        // 标记我们的外设,让他的生命周期 = vc
-        self.peripheral = peripheral;
-        // 发现完之后就是进行连接
-        [self.centralManager connectPeripheral:self.peripheral options:nil];
-        NSLog(@"%s, line = %d", __FUNCTION__, __LINE__);
+-(void)setupServiceAndCharacteristics {
+    // 创建服务
+    CBUUID *serviceID = [CBUUID UUIDWithString:SERVICE_UUID];
+    CBMutableService *service = [[CBMutableService alloc] initWithType:serviceID primary:YES];
+    // 创建服务中的特征
+    CBUUID *characteristicID = [CBUUID UUIDWithString:CHARACTERISTIC_UUID];
+    CBMutableCharacteristic *characteristic = [
+                                               [CBMutableCharacteristic alloc]
+                                               initWithType:characteristicID
+                                               properties:
+                                               CBCharacteristicPropertyRead |
+                                               CBCharacteristicPropertyWrite |
+                                               CBCharacteristicPropertyNotify
+                                               value:nil
+                                               permissions:CBAttributePermissionsReadable |
+                                               CBAttributePermissionsWriteable
+                                               ];
+    // 特征添加进服务
+    service.characteristics = @[characteristic];
+    // 服务加入管理
+    [self.peripheralManager addService:service];
+    // 为了手动给中心设备发送数据
+    self.characteristic = characteristic;
+}
+
+#pragma mark - CBPeripheralManagerDelegate
+
+/*
+ 设备的蓝牙状态
+ CBManagerStateUnknown = 0,  未知
+ CBManagerStateResetting,    重置中
+ CBManagerStateUnsupported,  不支持
+ CBManagerStateUnauthorized, 未验证
+ CBManagerStatePoweredOff,   未启动
+ CBManagerStatePoweredOn,    可用
+ */
+- (void)peripheralManagerDidUpdateState:(CBPeripheralManager *)peripheral {
+    if (peripheral.state == CBManagerStatePoweredOn) {
+        // 创建Service（服务）和Characteristics（特征）
+        [self setupServiceAndCharacteristics];
+        // 根据服务的UUID开始广播
+        [self.peripheralManager startAdvertising:@{CBAdvertisementDataServiceUUIDsKey:@[[CBUUID UUIDWithString:SERVICE_UUID]]}];
+    }
+    else {
+        [ViewController showAlert:@"请检查蓝牙是否开启"];
     }
 }
 
-// 中心管理者连接外设成功
-- (void)centralManager:(CBCentralManager *)central // 中心管理者
-  didConnectPeripheral:(CBPeripheral *)peripheral // 外设
-{
-    NSLog(@"%s, line = %d, %@=连接成功", __FUNCTION__, __LINE__, peripheral.name);
-    // 连接成功之后,可以进行服务和特征的发现
-    
-    //  设置外设的代理
-    self.peripheral.delegate = self;
-    
-    // 外设发现服务,传nil代表不过滤
-    // 这里会触发外设的代理方法 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error
-    [self.peripheral discoverServices:nil];
-}
-// 外设连接失败
-- (void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
-{
-    NSLog(@"%s, line = %d, %@=连接失败", __FUNCTION__, __LINE__, peripheral.name);
+/** 中心设备读取数据的时候回调 */
+- (void)peripheralManager:(CBPeripheralManager *)peripheral didReceiveReadRequest:(CBATTRequest *)request {
+    // 请求中的数据，这里把文本框中的数据发给中心设备
+    request.value = [self.textField.stringValue dataUsingEncoding:NSUTF8StringEncoding];
+    // 成功响应请求
+    [peripheral respondToRequest:request withResult:CBATTErrorSuccess];
 }
 
-// 丢失连接
-- (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
-{
-    NSLog(@"%s, line = %d, %@=断开连接", __FUNCTION__, __LINE__, peripheral.name);
+/** 中心设备写入数据的时候回调 */
+- (void)peripheralManager:(CBPeripheralManager *)peripheral didReceiveWriteRequests:(NSArray<CBATTRequest *> *)requests {
+    // 写入数据的请求
+    CBATTRequest *request = requests.lastObject;
+    // 把写入的数据显示在文本框中
+    self.textField.stringValue = [[NSString alloc] initWithData:request.value encoding:NSUTF8StringEncoding];
 }
 
-#pragma mark - CBPeripheralDelegate
-
-- (void)peripheralDidUpdateName:(CBPeripheral *)peripheral {
-    NSLog(@"peripheralDidUpdateName:%@", peripheral.name);
+/** 订阅成功回调 */
+-(void)peripheralManager:(CBPeripheralManager *)peripheral central:(CBCentral *)central didSubscribeToCharacteristic:(CBCharacteristic *)characteristic {
+    NSLog(@"%s",__FUNCTION__);
 }
 
--(void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error {
-    NSLog(@"%@", peripheral.services);
+/** 取消订阅回调 */
+-(void)peripheralManager:(CBPeripheralManager *)peripheral central:(CBCentral *)central didUnsubscribeFromCharacteristic:(CBCharacteristic *)characteristic {
+    NSLog(@"%s",__FUNCTION__);
 }
--(void)peripheral:(CBPeripheral *)peripheral didDiscoverIncludedServicesForService:(CBService *)service error:(NSError *)error {
-    NSLog(@"%@", peripheral.services);
-}
-// 发现外设服务里的特征的时候调用的代理方法(这个是比较重要的方法，你在这里可以通过事先知道UUID找到你需要的特征，订阅特征，或者这里写入数据给特征也可以)
-- (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error
-{
-    NSLog(@"%s, line = %d", __FUNCTION__, __LINE__);
-    
-//    for (CBCharacteristic *cha in service.characteristics) {
-//        //NSLog(@"%s, line = %d, char = %@", __FUNCTION__, __LINE__, cha);
-//
-//    }
-}
-// 更新特征的value的时候会调用 （凡是从蓝牙传过来的数据都要经过这个回调，简单的说这个方法就是你拿数据的唯一方法） 你可以判断是否
-- (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
-{
-    NSLog(@"value = %@", characteristic.value);
-}
+
+
+
 @end
