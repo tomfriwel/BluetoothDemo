@@ -9,7 +9,7 @@
 #import "ViewController.h"
 #import <CoreBluetooth/CoreBluetooth.h>
 
-#define SERVICE_UUID @"CDD1"
+#define SERVICE_UUID @"FEE0"
 #define CHARACTERISTIC_UUID @"CDD2"
 
 @interface ViewController()<CBPeripheralManagerDelegate>
@@ -35,7 +35,6 @@
     
     // Update the view, if already loaded.
 }
-
 #pragma mark - util
 
 +(void)showAlert:(NSString *)message {
@@ -98,7 +97,7 @@
         // 创建Service（服务）和Characteristics（特征）
         [self setupServiceAndCharacteristics];
         // 根据服务的UUID开始广播
-        [self.peripheralManager startAdvertising:@{CBAdvertisementDataServiceUUIDsKey:@[[CBUUID UUIDWithString:SERVICE_UUID]]}];
+        [self.peripheralManager startAdvertising:@{CBAdvertisementDataServiceUUIDsKey:@[[CBUUID UUIDWithString:SERVICE_UUID]], CBAdvertisementDataLocalNameKey:@"Test tomfriwel"}];
     }
     else {
         [ViewController showAlert:@"请检查蓝牙是否开启"];

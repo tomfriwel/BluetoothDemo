@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13196" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -18,29 +19,69 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="GNB-Q4-eZ5">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <rect key="frame" x="0.0" y="200" width="375" height="467"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <connections>
                                     <outlet property="dataSource" destination="BYZ-38-t0r" id="2jd-IC-8Zv"/>
                                     <outlet property="delegate" destination="BYZ-38-t0r" id="q0J-tG-pUX"/>
                                 </connections>
                             </tableView>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Rhk-Ow-noP">
+                                <rect key="frame" x="87.5" y="60" width="200" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="8d4-Yi-eKw"/>
+                                    <constraint firstAttribute="width" constant="200" id="xV4-My-n47"/>
+                                </constraints>
+                                <nil key="textColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vNR-Xb-a3u">
+                                <rect key="frame" x="225" y="100" width="50" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="FYf-uP-0Gk"/>
+                                    <constraint firstAttribute="width" constant="50" id="HC5-OY-cSE"/>
+                                </constraints>
+                                <state key="normal" title="read"/>
+                                <connections>
+                                    <action selector="didClickGet:" destination="BYZ-38-t0r" eventType="touchUpInside" id="bbl-ig-KvV"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PeL-gL-N8b">
+                                <rect key="frame" x="100" y="100" width="50" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="Zg7-CJ-BOW"/>
+                                    <constraint firstAttribute="width" constant="50" id="ig9-X1-4OB"/>
+                                </constraints>
+                                <state key="normal" title="write"/>
+                                <connections>
+                                    <action selector="didClickPost:" destination="BYZ-38-t0r" eventType="touchUpInside" id="aZk-pr-VQr"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="GNB-Q4-eZ5" secondAttribute="bottom" id="4c4-ZS-Twp"/>
+                            <constraint firstItem="Rhk-Ow-noP" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="G4F-9e-EAd"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="GNB-Q4-eZ5" secondAttribute="trailing" id="HdP-rl-Tac"/>
-                            <constraint firstItem="GNB-Q4-eZ5" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="XOM-f0-AsK"/>
+                            <constraint firstItem="GNB-Q4-eZ5" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" constant="200" id="XOM-f0-AsK"/>
+                            <constraint firstItem="PeL-gL-N8b" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="100" id="av5-HY-Nd6"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="vNR-Xb-a3u" secondAttribute="trailing" constant="100" id="rRx-Uo-GEx"/>
+                            <constraint firstItem="PeL-gL-N8b" firstAttribute="top" secondItem="Rhk-Ow-noP" secondAttribute="bottom" constant="10" id="s6P-bK-oWY"/>
+                            <constraint firstItem="Rhk-Ow-noP" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="40" id="vOg-4s-9AL"/>
+                            <constraint firstItem="vNR-Xb-a3u" firstAttribute="top" secondItem="Rhk-Ow-noP" secondAttribute="bottom" constant="10" id="vzs-SD-gsv"/>
                             <constraint firstItem="GNB-Q4-eZ5" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="yku-AJ-FNT"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
                         <outlet property="myTableView" destination="GNB-Q4-eZ5" id="09B-v7-n6N"/>
+                        <outlet property="textField" destination="Rhk-Ow-noP" id="k84-xZ-N5p"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="145" y="99"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="g2M-9m-ifr">
