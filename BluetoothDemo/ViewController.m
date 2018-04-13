@@ -10,20 +10,23 @@
 
 #import "ViewController.h"
 #import <CoreBluetooth/CoreBluetooth.h>
+#import "NSData+Conversion.h"
 
 #import "BLDeviceInfoCell.h"
 
 /** 判断手机蓝牙状态 */
-#define SERVICE_UUID        @"FEE0"
-#define CHARACTERISTIC_UUID @"CDD2"
-#define TEST_SERVICE_UUID @"FEE0"
+#define SERVICE_UUID        @"CDD1"
+#define CHARACTERISTIC_READ_UUID @"CDD2"
+#define CHARACTERISTIC_WRITE_UUID @"CDD3"
+//#define TEST_SERVICE_UUID @"CDD1"
 
 @interface ViewController ()<CBCentralManagerDelegate, CBPeripheralDelegate, UITableViewDelegate, UITableViewDataSource>
 /* 中心管理者 */
 @property (nonatomic, strong) CBCentralManager *centralManager;
 /* 连接到的外设 */
 @property (nonatomic, strong) CBPeripheral *peripheral;
-@property (nonatomic, strong) CBCharacteristic *characteristic;
+@property (nonatomic, strong) CBCharacteristic *characteristicRead;
+@property (nonatomic, strong) CBCharacteristic *characteristicWrite;
 
 @property (weak, nonatomic) IBOutlet UITextField *textField;
 @property (weak, nonatomic) IBOutlet UITableView *myTableView;
@@ -59,6 +62,16 @@
 
 #pragma mark - util methods
 
+
+id dataToArrayBuffer(NSData* data)
+{
+    return @{
+             @"CDVType" : @"ArrayBuffer",
+             @"data" :[data base64EncodedStringWithOptions:0],
+             @"bytes" :[data toArray]
+             };
+}
+
 -(void)showAlert:(NSString *)message {
     UIAlertController * alert=   [UIAlertController
                                   alertControllerWithTitle:@"Info"
@@ -91,15 +104,17 @@
 
 /** 写入数据 */
 - (IBAction)didClickPost:(id)sender {
+    NSString *str = self.textField.text;
+    NSLog(@"%s, %@", __FUNCTION__, str);
     // 用NSData类型来写入
-    NSData *data = [self.textField.text dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *data = [str dataUsingEncoding:NSUTF8StringEncoding];
     // 根据上面的特征self.characteristic来写入数据
-    [self.peripheral writeValue:data forCharacteristic:self.characteristic type:CBCharacteristicWriteWithResponse];
+    [self.peripheral writeValue:data forCharacteristic:self.characteristicWrite type:CBCharacteristicWriteWithoutResponse];
 }
 
 /** 读取数据 */
 - (IBAction)didClickGet:(id)sender {
-    [self.peripheral readValueForCharacteristic:self.characteristic];
+    [self.peripheral readValueForCharacteristic:self.characteristicRead];
 }
 
 #pragma mark - UITableViewDelegate, UITableViewDataSource
@@ -175,7 +190,7 @@
             NSLog(@"蓝牙可用");
             // 根据SERVICE_UUID来扫描外设，如果不设置SERVICE_UUID，则扫描所有蓝牙设备
 //            [central scanForPeripheralsWithServices:@[[CBUUID UUIDWithString:TEST_SERVICE_UUID]] options:nil];
-            [central scanForPeripheralsWithServices:nil options:nil];
+            [central scanForPeripheralsWithServices:@[[CBUUID UUIDWithString:SERVICE_UUID]] options:nil];
         }
     } else {
         // Fallback on earlier versions
@@ -200,9 +215,13 @@
     //        [central connectPeripheral:peripheral options:nil];
     //    }
     NSLog(@"advertisementData:%@", advertisementData);
+    NSData *mfgData = [advertisementData objectForKey:CBAdvertisementDataManufacturerDataKey];
+    if (mfgData) {
+        NSLog(@"%@", dataToArrayBuffer(mfgData));
+    }
     
     // 连接外设
-//    [central connectPeripheral:peripheral options:nil];
+    [central connectPeripheral:peripheral options:nil];
 }
 
 /** 连接成功 */
@@ -212,7 +231,7 @@
     // 设置代理
     peripheral.delegate = self;
     // 根据UUID来寻找服务
-    [peripheral discoverServices:@[[CBUUID UUIDWithString:TEST_SERVICE_UUID]]];
+    [peripheral discoverServices:@[[CBUUID UUIDWithString:SERVICE_UUID]]];
     NSLog(@"连接成功");
 }
 
@@ -245,10 +264,11 @@
     // 这里仅有一个服务，所以直接获取
     CBService *service = peripheral.services.lastObject;
     if(!service) {
+        NSLog(@"no service");
         return;
     }
     // 根据UUID寻找服务中的特征
-    [peripheral discoverCharacteristics:@[[CBUUID UUIDWithString:CHARACTERISTIC_UUID]] forService:service];
+    [peripheral discoverCharacteristics:@[[CBUUID UUIDWithString:CHARACTERISTIC_READ_UUID], [CBUUID UUIDWithString:CHARACTERISTIC_WRITE_UUID]] forService:service];
 }
 
 /** 发现特征回调 */
@@ -258,19 +278,28 @@
     for (CBCharacteristic *characteristic in service.characteristics) {
         NSLog(@"所有特征：%@", characteristic);
         // 从外设开发人员那里拿到不同特征的UUID，不同特征做不同事情，比如有读取数据的特征，也有写入数据的特征
+        
+        if([characteristic.UUID.UUIDString isEqualToString:CHARACTERISTIC_READ_UUID]) {
+            self.characteristicRead = characteristic;
+        }
+        else if([characteristic.UUID.UUIDString isEqualToString:CHARACTERISTIC_WRITE_UUID]) {
+            self.characteristicWrite = characteristic;
+        }
     }
     
     // 这里只获取一个特征，写入数据的时候需要用到这个特征
-    self.characteristic = service.characteristics.lastObject;
-    
-    if(!self.characteristic) {
+//    self.characteristic = service.characteristics.lastObject;
+//
+    if(!self.characteristicWrite || !self.characteristicRead) {
+        NSLog(@"no characteristic");
         return;
     }
-    // 直接读取这个特征数据，会调用didUpdateValueForCharacteristic
-    [peripheral readValueForCharacteristic:self.characteristic];
-    
-    // 订阅通知
-    [peripheral setNotifyValue:YES forCharacteristic:self.characteristic];
+//    // 直接读取这个特征数据，会调用didUpdateValueForCharacteristic
+    [peripheral readValueForCharacteristic:self.characteristicRead];
+//
+//    // 订阅通知
+    [peripheral setNotifyValue:YES forCharacteristic:self.characteristicRead];
+//    [peripheral setNotifyValue:YES forCharacteristic:self.characteristicWrite];
 }
 
 /** 订阅状态的改变 */
@@ -288,9 +317,12 @@
 
 /** 接收到数据回调 */
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error {
+    NSLog(@"%s", __FUNCTION__);
     // 拿到外设发送过来的数据,readValueForCharacteristic
-    NSData *data = characteristic.value;
-    self.textField.text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    if([characteristic.UUID.UUIDString isEqualToString:CHARACTERISTIC_READ_UUID]) {
+        NSData *data = characteristic.value;
+        self.textField.text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    }
 }
 
 /** 写入数据回调 */

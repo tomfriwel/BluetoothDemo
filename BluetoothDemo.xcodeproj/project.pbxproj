@@ -18,6 +18,8 @@
 		CF6CB2991F6A24ED003D8C56 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CF6CB2981F6A24ED003D8C56 /* Assets.xcassets */; };
 		CF6CB29C1F6A24ED003D8C56 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CF6CB29A1F6A24ED003D8C56 /* LaunchScreen.storyboard */; };
 		CF6CB29F1F6A24ED003D8C56 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = CF6CB29E1F6A24ED003D8C56 /* main.m */; };
+		CFB24DAD207F58730058463D /* NSData+Conversion.m in Sources */ = {isa = PBXBuildFile; fileRef = CFB24DAB207F58730058463D /* NSData+Conversion.m */; };
+		CFB24DAE207F58730058463D /* NSData+Conversion.m in Sources */ = {isa = PBXBuildFile; fileRef = CFB24DAB207F58730058463D /* NSData+Conversion.m */; };
 		CFCE7A9E2060F6830073A28A /* BLDeviceInfoCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CFCE7A9C2060F6830073A28A /* BLDeviceInfoCell.m */; };
 		CFCE7A9F2060F6830073A28A /* BLDeviceInfoCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CFCE7A9D2060F6830073A28A /* BLDeviceInfoCell.xib */; };
 /* End PBXBuildFile section */
@@ -43,6 +45,8 @@
 		CF6CB29D1F6A24ED003D8C56 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CF6CB29E1F6A24ED003D8C56 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		CF6CB2C41F6A32E0003D8C56 /* BluetoothDemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BluetoothDemo.entitlements; sourceTree = "<group>"; };
+		CFB24DAB207F58730058463D /* NSData+Conversion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Conversion.m"; sourceTree = "<group>"; };
+		CFB24DAC207F58730058463D /* NSData+Conversion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Conversion.h"; sourceTree = "<group>"; };
 		CFCE7A9B2060F6830073A28A /* BLDeviceInfoCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BLDeviceInfoCell.h; sourceTree = "<group>"; };
 		CFCE7A9C2060F6830073A28A /* BLDeviceInfoCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLDeviceInfoCell.m; sourceTree = "<group>"; };
 		CFCE7A9D2060F6830073A28A /* BLDeviceInfoCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = BLDeviceInfoCell.xib; sourceTree = "<group>"; };
@@ -92,6 +96,7 @@
 		CF6CB2831F6A24ED003D8C56 = {
 			isa = PBXGroup;
 			children = (
+				CFB24DAA207F58730058463D /* utils */,
 				CF6CB28E1F6A24ED003D8C56 /* BluetoothDemo */,
 				CF0F85CA1F6B85F600F74FD3 /* BluetoothDemoMac */,
 				CF6CB28D1F6A24ED003D8C56 /* Products */,
@@ -131,6 +136,15 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CFB24DAA207F58730058463D /* utils */ = {
+			isa = PBXGroup;
+			children = (
+				CFB24DAB207F58730058463D /* NSData+Conversion.m */,
+				CFB24DAC207F58730058463D /* NSData+Conversion.h */,
+			);
+			path = utils;
 			sourceTree = "<group>";
 		};
 		CFCE7A9A2060F6410073A28A /* views */ = {
@@ -253,6 +267,7 @@
 			files = (
 				CF0F85D31F6B85F600F74FD3 /* ViewController.m in Sources */,
 				CF0F85D01F6B85F600F74FD3 /* main.m in Sources */,
+				CFB24DAE207F58730058463D /* NSData+Conversion.m in Sources */,
 				CF0F85CD1F6B85F600F74FD3 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -261,6 +276,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CFB24DAD207F58730058463D /* NSData+Conversion.m in Sources */,
 				CF6CB2941F6A24ED003D8C56 /* ViewController.m in Sources */,
 				CF6CB29F1F6A24ED003D8C56 /* main.m in Sources */,
 				CF6CB2911F6A24ED003D8C56 /* AppDelegate.m in Sources */,

@@ -9,15 +9,17 @@
 #import "ViewController.h"
 #import <CoreBluetooth/CoreBluetooth.h>
 
-#define SERVICE_UUID @"FEE0"
-#define CHARACTERISTIC_UUID @"CDD2"
+#define SERVICE_UUID        @"CDD1"
+#define CHARACTERISTIC_READ_UUID @"CDD2"
+#define CHARACTERISTIC_WRITE_UUID @"CDD3"
 
 @interface ViewController()<CBPeripheralManagerDelegate>
 
 @property (weak) IBOutlet NSTextField *textField;
 
 @property (nonatomic, strong) CBPeripheralManager *peripheralManager;
-@property (nonatomic, strong) CBMutableCharacteristic *characteristic;
+@property (nonatomic, strong) CBMutableCharacteristic *characteristicRead;
+@property (nonatomic, strong) CBMutableCharacteristic *characteristicWrite;
 
 @end
 
@@ -40,7 +42,7 @@
 +(void)showAlert:(NSString *)message {
     NSAlert *alert = [[NSAlert alloc] init];
     [alert setMessageText:message];
-//    [alert setInformativeText:@"Informative text."];
+    //    [alert setInformativeText:@"Informative text."];
     [alert addButtonWithTitle:@"Cancel"];
     [alert addButtonWithTitle:@"Ok"];
     [alert runModal];
@@ -49,7 +51,7 @@
 #pragma mark - methods
 
 - (IBAction)sendValue:(id)sender {
-    BOOL sendSuccess = [self.peripheralManager updateValue:[self.textField.stringValue dataUsingEncoding:NSUTF8StringEncoding] forCharacteristic:self.characteristic onSubscribedCentrals:nil];
+    BOOL sendSuccess = [self.peripheralManager updateValue:[self.textField.stringValue dataUsingEncoding:NSUTF8StringEncoding] forCharacteristic:self.characteristicRead onSubscribedCentrals:nil];
     if (sendSuccess) {
         NSLog(@"数据发送成功");
     }else {
@@ -61,24 +63,37 @@
     CBUUID *serviceID = [CBUUID UUIDWithString:SERVICE_UUID];
     CBMutableService *service = [[CBMutableService alloc] initWithType:serviceID primary:YES];
     // 创建服务中的特征
-    CBUUID *characteristicID = [CBUUID UUIDWithString:CHARACTERISTIC_UUID];
-    CBMutableCharacteristic *characteristic = [
-                                               [CBMutableCharacteristic alloc]
-                                               initWithType:characteristicID
-                                               properties:
-                                               CBCharacteristicPropertyRead |
-                                               CBCharacteristicPropertyWrite |
-                                               CBCharacteristicPropertyNotify
-                                               value:nil
-                                               permissions:CBAttributePermissionsReadable |
-                                               CBAttributePermissionsWriteable
-                                               ];
+    CBUUID *characteristicIDRead = [CBUUID UUIDWithString:CHARACTERISTIC_READ_UUID];
+    CBMutableCharacteristic *characteristicRead = [
+                                                   [CBMutableCharacteristic alloc]
+                                                   initWithType:characteristicIDRead
+                                                   properties:
+                                                   CBCharacteristicPropertyRead |
+                                                   CBCharacteristicPropertyNotify
+                                                   value:nil
+                                                   permissions:CBAttributePermissionsReadable |
+                                                   CBAttributePermissionsWriteable
+                                                   ];
+    
+    CBUUID *characteristicIDWrite = [CBUUID UUIDWithString:CHARACTERISTIC_WRITE_UUID];
+    CBMutableCharacteristic *characteristicWrite = [
+                                                    [CBMutableCharacteristic alloc]
+                                                    initWithType:characteristicIDWrite
+                                                    properties:
+                                                    CBCharacteristicPropertyWrite |
+                                                    CBCharacteristicPropertyNotify |
+                                                    CBCharacteristicPropertyWriteWithoutResponse
+                                                    value:nil
+                                                    permissions:CBAttributePermissionsReadable |
+                                                    CBAttributePermissionsWriteable
+                                                    ];
     // 特征添加进服务
-    service.characteristics = @[characteristic];
+    service.characteristics = @[characteristicRead, characteristicWrite];
     // 服务加入管理
     [self.peripheralManager addService:service];
     // 为了手动给中心设备发送数据
-    self.characteristic = characteristic;
+    self.characteristicRead = characteristicRead;
+    self.characteristicWrite = characteristicWrite;
 }
 
 #pragma mark - CBPeripheralManagerDelegate
