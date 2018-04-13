@@ -28,6 +28,8 @@
 @property (nonatomic, strong) CBCharacteristic *characteristicRead;
 @property (nonatomic, strong) CBCharacteristic *characteristicWrite;
 
+@property (nonatomic, strong) NSArray *invalidatedServices;
+
 @property (weak, nonatomic) IBOutlet UITextField *textField;
 @property (weak, nonatomic) IBOutlet UITableView *myTableView;
 @property (nonatomic, strong) NSMutableArray *peripherals;
@@ -51,6 +53,17 @@
         _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:dispatch_get_main_queue()];
     }
     return _centralManager;
+}
+
+//-(void)setPeripheral:(CBPeripheral *)peripheral {
+//    _peripheral = peripheral;
+//}
+
+-(NSArray *)invalidatedServices {
+    if (!_invalidatedServices) {
+        _invalidatedServices = @[];
+    }
+    return _invalidatedServices;
 }
 
 -(NSMutableArray *)peripherals {
@@ -100,16 +113,42 @@ id dataToArrayBuffer(NSData* data)
     [self presentViewController:alert animated:YES completion:nil];
 }
 
++(BOOL)checkAvailable:(CBPeripheral *)peripheral {
+    if(!peripheral) {
+        return NO;
+    }
+    
+    BOOL res = NO;
+    switch (peripheral.state) {
+        case CBPeripheralStateConnected:
+            res = YES;
+            break;
+            
+        default:
+            res = NO;
+            break;
+    }
+    return res;
+}
+
 #pragma mark - methods
 
 /** 写入数据 */
 - (IBAction)didClickPost:(id)sender {
     NSString *str = self.textField.text;
     NSLog(@"%s, %@", __FUNCTION__, str);
-    // 用NSData类型来写入
-    NSData *data = [str dataUsingEncoding:NSUTF8StringEncoding];
-    // 根据上面的特征self.characteristic来写入数据
-    [self.peripheral writeValue:data forCharacteristic:self.characteristicWrite type:CBCharacteristicWriteWithoutResponse];
+    
+    if([[self class] checkAvailable:self.peripheral]) {
+        // 用NSData类型来写入
+        NSData *data = [str dataUsingEncoding:NSUTF8StringEncoding];
+        // 根据上面的特征self.characteristic来写入数据
+        [self.peripheral writeValue:data forCharacteristic:self.characteristicWrite type:CBCharacteristicWriteWithoutResponse];
+    }
+    else {
+        NSLog(@"外设不可用，重新扫描");
+        
+        [self centralManagerDidUpdateState:self.centralManager];
+    }
 }
 
 /** 读取数据 */
@@ -328,6 +367,12 @@ id dataToArrayBuffer(NSData* data)
 /** 写入数据回调 */
 - (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(nonnull CBCharacteristic *)characteristic error:(nullable NSError *)error {
     NSLog(@"写入成功");
+}
+
+-(void)peripheral:(CBPeripheral *)peripheral didModifyServices:(NSArray<CBService *> *)invalidatedServices {
+    NSLog(@"%s", __FUNCTION__);
+    
+    self.invalidatedServices = invalidatedServices;
 }
 
 

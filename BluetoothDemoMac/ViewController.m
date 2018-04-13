@@ -13,7 +13,7 @@
 #define CHARACTERISTIC_READ_UUID @"CDD2"
 #define CHARACTERISTIC_WRITE_UUID @"CDD3"
 
-@interface ViewController()<CBPeripheralManagerDelegate>
+@interface ViewController()<CBPeripheralManagerDelegate, NSTextFieldDelegate>
 
 @property (weak) IBOutlet NSTextField *textField;
 
@@ -121,6 +121,7 @@
 
 /** 中心设备读取数据的时候回调 */
 - (void)peripheralManager:(CBPeripheralManager *)peripheral didReceiveReadRequest:(CBATTRequest *)request {
+    NSLog(@"%s", __FUNCTION__);
     // 请求中的数据，这里把文本框中的数据发给中心设备
     request.value = [self.textField.stringValue dataUsingEncoding:NSUTF8StringEncoding];
     // 成功响应请求
@@ -129,6 +130,7 @@
 
 /** 中心设备写入数据的时候回调 */
 - (void)peripheralManager:(CBPeripheralManager *)peripheral didReceiveWriteRequests:(NSArray<CBATTRequest *> *)requests {
+    NSLog(@"%s", __FUNCTION__);
     // 写入数据的请求
     CBATTRequest *request = requests.lastObject;
     // 把写入的数据显示在文本框中
@@ -145,6 +147,12 @@
     NSLog(@"%s",__FUNCTION__);
 }
 
+#pragma mark - NSTextFieldDelegate
 
+-(void)controlTextDidChange:(NSNotification *)notification {
+    NSTextField *textField = [notification object];
+    NSLog(@"controlTextDidChange: stringValue == %@", [textField stringValue]);
+    [self sendValue:nil];
+}
 
 @end
