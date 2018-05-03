@@ -3,9 +3,9 @@ A bluetooth demo
 
 ### Intro
 
-Target BluetoothDemoMac(macOS) is peripheral, BluetoothDemo(iOS) is central.
+For the convenience of the experiment, I use target BluetoothDemoMac(macOS) as peripheral and BluetoothDemo(iOS) as central.
 
-### Notice
+### Notices
 
 - I found that `CBCharacteristicWriteWithResponse` can write only once, `CBCharacteristicWriteWithoutResponse` can write always.
 
