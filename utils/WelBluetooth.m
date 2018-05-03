@@ -12,10 +12,25 @@
 
 //设备状态改变的委托
 typedef void (^CentralManagerDidUpdateStateBlock)(CBCentralManager *central);
+typedef void (^CentralManagerWillRestoreStateBlock)(CBCentralManager *central, NSDictionary<NSString *, id> *dict);
+typedef void (^CentralManagerDidDiscoverPeripheralBlock)(CBCentralManager *central, CBPeripheral *peripheral, NSDictionary<NSString *, id> *advertisementData, NSNumber *RSSI);
+typedef void (^CentralManagerDidConnectPeripheralBlock)(CBCentralManager *central, CBPeripheral *peripheral);
+typedef void (^CentralManagerDidFailToConnectPeripheralBlock)(CBCentralManager *central, CBPeripheral *peripheral, NSError *error);
+typedef void (^CentralManagerDidDisconnectPeripheralBlock)(CBCentralManager *central, CBPeripheral *peripheral, NSError *error);
+
+
+typedef void (^PeripheralsDidChangeBlock)(NSArray *peripherals);
 
 @interface WelBluetooth()<CBCentralManagerDelegate, CBPeripheralDelegate>
 
 @property (nonatomic, copy) CentralManagerDidUpdateStateBlock centralManagerDidUpdateStateBlock;
+@property (nonatomic, copy) CentralManagerWillRestoreStateBlock centralManagerWillRestoreStateBlock;
+@property (nonatomic, copy) CentralManagerDidDiscoverPeripheralBlock centralManagerDidDiscoverPeripheralBlock;
+@property (nonatomic, copy) CentralManagerDidConnectPeripheralBlock centralManagerDidConnectPeripheralBlock;
+@property (nonatomic, copy) CentralManagerDidFailToConnectPeripheralBlock centralManagerDidFailToConnectPeripheralBlock;
+@property (nonatomic, copy) CentralManagerDidDisconnectPeripheralBlock centralManagerDidDisconnectPeripheralBlock;
+
+@property (nonatomic, copy) PeripheralsDidChangeBlock peripheralsDidChangeBlock;
 
 @end
 
@@ -30,6 +45,14 @@ typedef void (^CentralManagerDidUpdateStateBlock)(CBCentralManager *central);
     return instance;
 }
 
+-(NSMutableArray<CBPeripheral *> *)peripherals {
+    if(!_peripherals) {
+        _peripherals = [[NSMutableArray alloc] init];
+    }
+    
+    return _peripherals;
+}
+
 -(instancetype)init {
     self = [super init];
     
@@ -40,6 +63,12 @@ typedef void (^CentralManagerDidUpdateStateBlock)(CBCentralManager *central);
     return self;
 }
 
+#pragma mark - custom callbacks
+
+- (void)onPeripheralsDidChange:(void (^)(NSArray *peripherals))block {
+    _peripheralsDidChangeBlock = block;
+}
+
 #pragma mark - central manager callbacks
 
 - (void)onCentralManagerDidUpdateState:(void (^)(CBCentralManager *central))block {
@@ -47,26 +76,69 @@ typedef void (^CentralManagerDidUpdateStateBlock)(CBCentralManager *central);
 }
 
 - (void)onCentralManagerWillRestoreState:(void (^)(CBCentralManager *central, NSDictionary<NSString *, id> *dict))block {
-    
+    _centralManagerWillRestoreStateBlock = block;
 }
 
 - (void)onCentralManagerDidDiscoverPeripheral:(void (^)(CBCentralManager *central, CBPeripheral *peripheral, NSDictionary<NSString *, id> *advertisementData, NSNumber *RSSI))block {
-    
+    _centralManagerDidDiscoverPeripheralBlock = block;
 }
 
 - (void)onCentralManagerDidConnectPeripheral:(void (^)(CBCentralManager *central, CBPeripheral *peripheral))block {
-    
+    _centralManagerDidConnectPeripheralBlock = block;
 }
 
 - (void)onCentralManagerDidFailToConnectPeripheral:(void (^)(CBCentralManager *central, CBPeripheral *peripheral, NSError *error))block {
-    
+    _centralManagerDidFailToConnectPeripheralBlock = block;
 }
 
 - (void)onCentralManagerDidDisconnectPeripheral:(void (^)(CBCentralManager *central, CBPeripheral *peripheral, NSError *error))block {
-    
+    _centralManagerDidDisconnectPeripheralBlock = block;
 }
 
 #pragma mark - peripheral manager callbacks
+
+- (void)onPeripheralDidModifyServices:(void (^)(CBPeripheral *peripheral, NSArray<CBService *> *invalidatedServices))block {
+}
+
+- (void)onPeripheralDidUpdateRSSI:(void (^)(CBPeripheral *peripheral, NSError *error))block {
+}
+
+- (void)onPeripheralDidReadRSSI:(void (^)(CBPeripheral *peripheral, NSNumber *RSSI, NSError *error))block {
+}
+
+- (void)onPeripheralDidDiscoverServices:(void (^)(CBPeripheral *peripheral, NSError *error))block {
+}
+
+- (void)onPeripheralDidDiscoverIncludedServicesForService:(void (^)(CBPeripheral *peripheral, CBService *service, NSError *error))block {
+}
+
+- (void)onPeripheralDidDiscoverCharacteristicsForService:(void (^)(CBPeripheral *peripheral, NSError *error))block {
+}
+
+- (void)onPeripheralDidUpdateValueForCharacteristic:(void (^)(CBPeripheral *peripheral, CBCharacteristic *characteristic, NSError *error))block {
+}
+
+- (void)onPeripheralDidWriteValueForCharacteristic:(void (^)(CBPeripheral *peripheral, CBCharacteristic *characteristic, NSError *error))block {
+}
+
+- (void)onPeripheralDidUpdateNotificationStateForCharacteristic:(void (^)(CBPeripheral *peripheral, CBCharacteristic *characteristic, NSError *error))block {
+}
+
+- (void)onPeripheralDidDiscoverDescriptorsForCharacteristic:(void (^)(CBPeripheral *peripheral, CBCharacteristic *characteristic, NSError *error))block {
+}
+
+- (void)onPeripheralDidUpdateValueForDescriptor:(void (^)(CBPeripheral *peripheral, CBDescriptor *descriptor, NSError *error))block {
+}
+
+- (void)onPeripheralDidWriteValueForDescriptor:(void (^)(CBPeripheral *peripheral, CBDescriptor *descriptor, NSError *error))block {
+}
+
+- (void)onPeripheralIsReadyToSendWriteWithoutResponse:(void (^)(CBPeripheral *peripheral))block {
+}
+
+- (void)onPeripheralDidOpenL2CAPChannel:(void (^)(CBPeripheral *peripheral, CBL2CAPChannel *channel, NSError *error))block API_AVAILABLE(ios(11.0)){
+}
+
 
 #pragma mark - CBCentralManagerDelegate
 
