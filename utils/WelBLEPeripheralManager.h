@@ -7,7 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <CoreBluetooth/CoreBluetooth.h>
 
-@interface WelBLEPeripheralManager : NSObject
+@interface WelBLEPeripheralManager : NSObject<CBPeripheralManagerDelegate>
 
 @end
