@@ -108,6 +108,19 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		CF4E6E64209B061400511C21 /* WelBluetooth */ = {
+			isa = PBXGroup;
+			children = (
+				CF4E6E55209AAF3E00511C21 /* WelBluetooth.h */,
+				CF4E6E56209AAF3E00511C21 /* WelBluetooth.m */,
+				CF4E6E5C209B02DA00511C21 /* WelBLECentralManager.h */,
+				CF4E6E5D209B02DA00511C21 /* WelBLECentralManager.m */,
+				CF4E6E5F209B02F500511C21 /* WelBLEPeripheralManager.h */,
+				CF4E6E60209B02F500511C21 /* WelBLEPeripheralManager.m */,
+			);
+			path = WelBluetooth;
+			sourceTree = "<group>";
+		};
 		CF6CB2831F6A24ED003D8C56 = {
 			isa = PBXGroup;
 			children = (
@@ -158,14 +171,9 @@
 		CFB24DAA207F58730058463D /* utils */ = {
 			isa = PBXGroup;
 			children = (
+				CF4E6E64209B061400511C21 /* WelBluetooth */,
 				CFB24DAB207F58730058463D /* NSData+Conversion.m */,
 				CFB24DAC207F58730058463D /* NSData+Conversion.h */,
-				CF4E6E55209AAF3E00511C21 /* WelBluetooth.h */,
-				CF4E6E56209AAF3E00511C21 /* WelBluetooth.m */,
-				CF4E6E5C209B02DA00511C21 /* WelBLECentralManager.h */,
-				CF4E6E5D209B02DA00511C21 /* WelBLECentralManager.m */,
-				CF4E6E5F209B02F500511C21 /* WelBLEPeripheralManager.h */,
-				CF4E6E60209B02F500511C21 /* WelBLEPeripheralManager.m */,
 			);
 			path = utils;
 			sourceTree = "<group>";
