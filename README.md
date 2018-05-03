@@ -5,6 +5,8 @@ A bluetooth demo
 
 For the convenience of the experiment, I use target BluetoothDemoMac(macOS) as peripheral and BluetoothDemo(iOS) as central.
 
+Recently, I was packaging bluetooth to `WelBluetooth`.
+
 ### Notices
 
 - I found that `CBCharacteristicWriteWithResponse` can write only once, `CBCharacteristicWriteWithoutResponse` can write always.
