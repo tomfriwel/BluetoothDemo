@@ -12,6 +12,9 @@
 		CF0F85D31F6B85F600F74FD3 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CF0F85D21F6B85F600F74FD3 /* ViewController.m */; };
 		CF0F85D51F6B85F600F74FD3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CF0F85D41F6B85F600F74FD3 /* Assets.xcassets */; };
 		CF0F85D81F6B85F600F74FD3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CF0F85D61F6B85F600F74FD3 /* Main.storyboard */; };
+		CF4E6E57209AAF3E00511C21 /* WelBluetooth.m in Sources */ = {isa = PBXBuildFile; fileRef = CF4E6E56209AAF3E00511C21 /* WelBluetooth.m */; };
+		CF4E6E58209AAF3E00511C21 /* WelBluetooth.m in Sources */ = {isa = PBXBuildFile; fileRef = CF4E6E56209AAF3E00511C21 /* WelBluetooth.m */; };
+		CF4E6E5B209AE1A600511C21 /* WelDemoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CF4E6E5A209AE1A600511C21 /* WelDemoViewController.m */; };
 		CF6CB2911F6A24ED003D8C56 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = CF6CB2901F6A24ED003D8C56 /* AppDelegate.m */; };
 		CF6CB2941F6A24ED003D8C56 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CF6CB2931F6A24ED003D8C56 /* ViewController.m */; };
 		CF6CB2971F6A24ED003D8C56 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CF6CB2951F6A24ED003D8C56 /* Main.storyboard */; };
@@ -34,6 +37,10 @@
 		CF0F85D41F6B85F600F74FD3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CF0F85D71F6B85F600F74FD3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		CF0F85D91F6B85F600F74FD3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CF4E6E55209AAF3E00511C21 /* WelBluetooth.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WelBluetooth.h; sourceTree = "<group>"; };
+		CF4E6E56209AAF3E00511C21 /* WelBluetooth.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WelBluetooth.m; sourceTree = "<group>"; };
+		CF4E6E59209AE1A600511C21 /* WelDemoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WelDemoViewController.h; sourceTree = "<group>"; };
+		CF4E6E5A209AE1A600511C21 /* WelDemoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WelDemoViewController.m; sourceTree = "<group>"; };
 		CF6CB28C1F6A24ED003D8C56 /* BluetoothDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BluetoothDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CF6CB28F1F6A24ED003D8C56 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		CF6CB2901F6A24ED003D8C56 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -122,6 +129,8 @@
 				CF6CB2901F6A24ED003D8C56 /* AppDelegate.m */,
 				CF6CB2921F6A24ED003D8C56 /* ViewController.h */,
 				CF6CB2931F6A24ED003D8C56 /* ViewController.m */,
+				CF4E6E59209AE1A600511C21 /* WelDemoViewController.h */,
+				CF4E6E5A209AE1A600511C21 /* WelDemoViewController.m */,
 				CF6CB2951F6A24ED003D8C56 /* Main.storyboard */,
 				CF6CB2981F6A24ED003D8C56 /* Assets.xcassets */,
 				CF6CB29A1F6A24ED003D8C56 /* LaunchScreen.storyboard */,
@@ -143,6 +152,8 @@
 			children = (
 				CFB24DAB207F58730058463D /* NSData+Conversion.m */,
 				CFB24DAC207F58730058463D /* NSData+Conversion.h */,
+				CF4E6E55209AAF3E00511C21 /* WelBluetooth.h */,
+				CF4E6E56209AAF3E00511C21 /* WelBluetooth.m */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -269,6 +280,7 @@
 				CF0F85D01F6B85F600F74FD3 /* main.m in Sources */,
 				CFB24DAE207F58730058463D /* NSData+Conversion.m in Sources */,
 				CF0F85CD1F6B85F600F74FD3 /* AppDelegate.m in Sources */,
+				CF4E6E58209AAF3E00511C21 /* WelBluetooth.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -277,6 +289,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				CFB24DAD207F58730058463D /* NSData+Conversion.m in Sources */,
+				CF4E6E57209AAF3E00511C21 /* WelBluetooth.m in Sources */,
+				CF4E6E5B209AE1A600511C21 /* WelDemoViewController.m in Sources */,
 				CF6CB2941F6A24ED003D8C56 /* ViewController.m in Sources */,
 				CF6CB29F1F6A24ED003D8C56 /* main.m in Sources */,
 				CF6CB2911F6A24ED003D8C56 /* AppDelegate.m in Sources */,

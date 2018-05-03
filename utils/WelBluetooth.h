@@ -7,7 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <CoreBluetooth/CoreBluetooth.h>
 
 @interface WelBluetooth : NSObject
+
++(WelBluetooth *)shared;
+
+- (void)onCentralManagerDidUpdateState:(void (^)(CBCentralManager *central))block;
 
 @end

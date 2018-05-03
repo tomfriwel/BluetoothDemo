@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="VaB-o1-uhC">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -83,10 +83,10 @@
             </objects>
             <point key="canvasLocation" x="145" y="99"/>
         </scene>
-        <!--View Controller-->
+        <!--Wel Demo View Controller-->
         <scene sceneID="g2M-9m-ifr">
             <objects>
-                <viewController id="VaB-o1-uhC" sceneMemberID="viewController">
+                <viewController id="VaB-o1-uhC" customClass="WelDemoViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="X00-bq-UcU">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
