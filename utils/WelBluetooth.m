@@ -45,7 +45,7 @@ typedef void (^PeripheralsDidChangeBlock)(NSArray *peripherals);
     return instance;
 }
 
--(NSMutableArray<CBPeripheral *> *)peripherals {
+-(NSMutableArray *)peripherals {
     if(!_peripherals) {
         _peripherals = [[NSMutableArray alloc] init];
     }
@@ -61,6 +61,39 @@ typedef void (^PeripheralsDidChangeBlock)(NSArray *peripherals);
     }
     
     return self;
+}
+
+#pragma mark - peripheral handlers
+
+-(void)addPeripheral:(CBPeripheral *)peripheral RSSI:(NSNumber *)RSSI {
+    if (peripheral.name.length <= 0) {
+        return ;
+    }
+    
+    if (self.peripherals.count == 0) {
+        NSDictionary *dict = @{@"peripheral":peripheral, @"RSSI":RSSI};
+        [self.peripherals addObject:dict];
+    } else {
+        BOOL isExist = NO;
+        for (int i = 0; i < self.peripherals.count; i++) {
+            NSDictionary *dict = [self.peripherals objectAtIndex:i];
+            CBPeripheral *per = dict[@"peripheral"];
+            if ([per.identifier.UUIDString isEqualToString:peripheral.identifier.UUIDString]) {
+                isExist = YES;
+                NSDictionary *dict = @{@"peripheral":peripheral, @"RSSI":RSSI};
+                [self.peripherals replaceObjectAtIndex:i withObject:dict];
+            }
+        }
+        
+        if (!isExist) {
+            NSDictionary *dict = @{@"peripheral":peripheral, @"RSSI":RSSI};
+            [self.peripherals addObject:dict];
+        }
+    }
+    
+    if (self.peripheralsDidChangeBlock) {
+        self.peripheralsDidChangeBlock([NSArray arrayWithArray:self.peripherals]);
+    }
 }
 
 #pragma mark - custom callbacks

@@ -77,9 +77,9 @@
 #pragma mark - peripherals handlers
 
 -(void)addPeripheral:(CBPeripheral *)peripheral RSSI:(NSNumber *)RSSI {
-    if (peripheral.name.length <= 0) {
-        return ;
-    }
+//    if (peripheral.name.length <= 0) {
+//        return ;
+//    }
     
     if (self.peripherals.count == 0) {
         NSDictionary *dict = @{@"peripheral":peripheral, @"RSSI":RSSI};
