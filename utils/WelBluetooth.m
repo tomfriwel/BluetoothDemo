@@ -21,7 +21,7 @@ typedef void (^CentralManagerDidDisconnectPeripheralBlock)(CBCentralManager *cen
 
 typedef void (^PeripheralsDidChangeBlock)(NSArray *peripherals);
 
-@interface WelBluetooth()<CBCentralManagerDelegate, CBPeripheralDelegate>
+@interface WelBluetooth()<CBCentralManagerDelegate, CBPeripheralDelegate, CBPeripheralManagerDelegate>
 
 @property (nonatomic, copy) CentralManagerDidUpdateStateBlock centralManagerDidUpdateStateBlock;
 @property (nonatomic, copy) CentralManagerWillRestoreStateBlock centralManagerWillRestoreStateBlock;
@@ -51,6 +51,22 @@ typedef void (^PeripheralsDidChangeBlock)(NSArray *peripherals);
     }
     
     return _peripherals;
+}
+
+-(CBCentralManager *)centralManager {
+    if (!_centralManager) {
+        // 创建中心设备管理器，会回调centralManagerDidUpdateState
+        _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:dispatch_get_main_queue()];
+    }
+    return _centralManager;
+}
+
+-(CBPeripheralManager *)peripheralManager {
+    if (!_peripheralManager) {
+        // 创建外设管理器，会回调peripheralManagerDidUpdateState方法
+        _peripheralManager = [[CBPeripheralManager alloc] initWithDelegate:self queue:dispatch_get_main_queue()];
+    }
+    return _peripheralManager;
 }
 
 -(instancetype)init {

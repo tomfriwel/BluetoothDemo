@@ -15,6 +15,8 @@
 
 - (void)onCentralManagerDidUpdateState:(void (^)(CBCentralManager *central))block;
 
+@property (nonatomic, strong) CBCentralManager *centralManager;
+@property (nonatomic, strong) CBPeripheralManager *peripheralManager;
 @property (nonatomic, strong) NSMutableArray *peripherals;
 
 - (void)onPeripheralsDidChange:(void (^)(NSArray *peripherals))block;

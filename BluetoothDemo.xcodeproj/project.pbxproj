@@ -15,6 +15,10 @@
 		CF4E6E57209AAF3E00511C21 /* WelBluetooth.m in Sources */ = {isa = PBXBuildFile; fileRef = CF4E6E56209AAF3E00511C21 /* WelBluetooth.m */; };
 		CF4E6E58209AAF3E00511C21 /* WelBluetooth.m in Sources */ = {isa = PBXBuildFile; fileRef = CF4E6E56209AAF3E00511C21 /* WelBluetooth.m */; };
 		CF4E6E5B209AE1A600511C21 /* WelDemoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CF4E6E5A209AE1A600511C21 /* WelDemoViewController.m */; };
+		CF4E6E5E209B02DA00511C21 /* WelBLECentralManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CF4E6E5D209B02DA00511C21 /* WelBLECentralManager.m */; };
+		CF4E6E61209B02F500511C21 /* WelBLEPeripheralManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CF4E6E60209B02F500511C21 /* WelBLEPeripheralManager.m */; };
+		CF4E6E62209B02F500511C21 /* WelBLEPeripheralManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CF4E6E60209B02F500511C21 /* WelBLEPeripheralManager.m */; };
+		CF4E6E63209B02F900511C21 /* WelBLECentralManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CF4E6E5D209B02DA00511C21 /* WelBLECentralManager.m */; };
 		CF6CB2911F6A24ED003D8C56 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = CF6CB2901F6A24ED003D8C56 /* AppDelegate.m */; };
 		CF6CB2941F6A24ED003D8C56 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CF6CB2931F6A24ED003D8C56 /* ViewController.m */; };
 		CF6CB2971F6A24ED003D8C56 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CF6CB2951F6A24ED003D8C56 /* Main.storyboard */; };
@@ -41,6 +45,10 @@
 		CF4E6E56209AAF3E00511C21 /* WelBluetooth.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WelBluetooth.m; sourceTree = "<group>"; };
 		CF4E6E59209AE1A600511C21 /* WelDemoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WelDemoViewController.h; sourceTree = "<group>"; };
 		CF4E6E5A209AE1A600511C21 /* WelDemoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WelDemoViewController.m; sourceTree = "<group>"; };
+		CF4E6E5C209B02DA00511C21 /* WelBLECentralManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WelBLECentralManager.h; sourceTree = "<group>"; };
+		CF4E6E5D209B02DA00511C21 /* WelBLECentralManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WelBLECentralManager.m; sourceTree = "<group>"; };
+		CF4E6E5F209B02F500511C21 /* WelBLEPeripheralManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WelBLEPeripheralManager.h; sourceTree = "<group>"; };
+		CF4E6E60209B02F500511C21 /* WelBLEPeripheralManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WelBLEPeripheralManager.m; sourceTree = "<group>"; };
 		CF6CB28C1F6A24ED003D8C56 /* BluetoothDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BluetoothDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CF6CB28F1F6A24ED003D8C56 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		CF6CB2901F6A24ED003D8C56 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -154,6 +162,10 @@
 				CFB24DAC207F58730058463D /* NSData+Conversion.h */,
 				CF4E6E55209AAF3E00511C21 /* WelBluetooth.h */,
 				CF4E6E56209AAF3E00511C21 /* WelBluetooth.m */,
+				CF4E6E5C209B02DA00511C21 /* WelBLECentralManager.h */,
+				CF4E6E5D209B02DA00511C21 /* WelBLECentralManager.m */,
+				CF4E6E5F209B02F500511C21 /* WelBLEPeripheralManager.h */,
+				CF4E6E60209B02F500511C21 /* WelBLEPeripheralManager.m */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -277,7 +289,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				CF0F85D31F6B85F600F74FD3 /* ViewController.m in Sources */,
+				CF4E6E63209B02F900511C21 /* WelBLECentralManager.m in Sources */,
 				CF0F85D01F6B85F600F74FD3 /* main.m in Sources */,
+				CF4E6E62209B02F500511C21 /* WelBLEPeripheralManager.m in Sources */,
 				CFB24DAE207F58730058463D /* NSData+Conversion.m in Sources */,
 				CF0F85CD1F6B85F600F74FD3 /* AppDelegate.m in Sources */,
 				CF4E6E58209AAF3E00511C21 /* WelBluetooth.m in Sources */,
@@ -288,6 +302,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CF4E6E5E209B02DA00511C21 /* WelBLECentralManager.m in Sources */,
 				CFB24DAD207F58730058463D /* NSData+Conversion.m in Sources */,
 				CF4E6E57209AAF3E00511C21 /* WelBluetooth.m in Sources */,
 				CF4E6E5B209AE1A600511C21 /* WelDemoViewController.m in Sources */,
@@ -295,6 +310,7 @@
 				CF6CB29F1F6A24ED003D8C56 /* main.m in Sources */,
 				CF6CB2911F6A24ED003D8C56 /* AppDelegate.m in Sources */,
 				CFCE7A9E2060F6830073A28A /* BLDeviceInfoCell.m in Sources */,
+				CF4E6E61209B02F500511C21 /* WelBLEPeripheralManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
