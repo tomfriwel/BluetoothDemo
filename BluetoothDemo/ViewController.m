@@ -11,6 +11,7 @@
 #import "ViewController.h"
 #import <CoreBluetooth/CoreBluetooth.h>
 #import "NSData+Conversion.h"
+#import <math.h>
 
 #import "BLDeviceInfoCell.h"
 
@@ -73,6 +74,39 @@
     return _peripherals;
 }
 
+#pragma mark - peripherals handlers
+
+-(void)addPeripheral:(CBPeripheral *)peripheral RSSI:(NSNumber *)RSSI {
+    if (peripheral.name.length <= 0) {
+        return ;
+    }
+    
+    if (self.peripherals.count == 0) {
+        NSDictionary *dict = @{@"peripheral":peripheral, @"RSSI":RSSI};
+        [self.peripherals addObject:dict];
+    } else {
+        BOOL isExist = NO;
+        for (int i = 0; i < self.peripherals.count; i++) {
+            NSDictionary *dict = [self.peripherals objectAtIndex:i];
+            CBPeripheral *per = dict[@"peripheral"];
+            if ([per.identifier.UUIDString isEqualToString:peripheral.identifier.UUIDString]) {
+                isExist = YES;
+                NSDictionary *dict = @{@"peripheral":peripheral, @"RSSI":RSSI};
+                [self.peripherals replaceObjectAtIndex:i withObject:dict];
+            }
+        }
+        
+        if (!isExist) {
+            NSDictionary *dict = @{@"peripheral":peripheral, @"RSSI":RSSI};
+            [self.peripherals addObject:dict];
+        }
+    }
+    
+    NSLog(@"%@", self.peripherals);
+    
+    [self.myTableView reloadData];
+}
+
 #pragma mark - util methods
 
 
@@ -131,6 +165,41 @@ id dataToArrayBuffer(NSData* data)
     return res;
 }
 
+//d=10^((ABS(RSSI)-A)/(10*n))
+//
+//
+//
+//其中d为距离，单位是m。
+//
+//RSSI为rssi信号强度，为负数。
+//
+//A为距离探测设备1m时的rssi值的绝对值，最佳范围在45-49之间。
+//
+//n为环境衰减因子，需要测试矫正，最佳范围在3.25-4.5之间。
+//https://blog.csdn.net/u013090676/article/details/73865137
++(CGFloat)RSSI2distance:(CGFloat)rssi {
+        CGFloat A = 45.0, n = 3.25;
+    
+        return 10.0*((fabs(rssi)-A)/(10.0*n));
+    
+    //    https://gist.github.com/eklimcz/446b56c0cb9cfe61d575
+//    CGFloat txPower = -59; //hard coded power value. Usually ranges between -59 to -65
+//
+//    if (rssi == 0) {
+//        return -1.0;
+//    }
+//
+//    CGFloat ratio = rssi*1.0/txPower;
+//    if (ratio < 1.0) {
+//
+//        return pow(ratio,10);
+//    }
+//    else {
+//        CGFloat distance =  (0.89976)*pow(ratio,7.7095) + 0.111;
+//        return distance;
+//    }
+}
+
 #pragma mark - methods
 
 /** 写入数据 */
@@ -158,66 +227,104 @@ id dataToArrayBuffer(NSData* data)
 
 #pragma mark - UITableViewDelegate, UITableViewDataSource
 
--(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
-}
+//-(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+//    return 1;
+//}
+//
+//-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+//    return self.peripherals.count;
+//}
+//
+//-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+//    NSInteger row = indexPath.row;
+//
+//    BLDeviceInfoCell *cell  = [tableView dequeueReusableCellWithIdentifier:NSStringFromClass(BLDeviceInfoCell.class)];
+//
+//    if (cell == nil) {
+//        NSArray *topLevelObjects = [[NSBundle mainBundle] loadNibNamed:NSStringFromClass(BLDeviceInfoCell.class) owner:self options:nil];
+//        for (id currentObject in topLevelObjects){
+//            if ([currentObject isKindOfClass:BLDeviceInfoCell.class]){
+//                cell =  currentObject;
+//                break;
+//            }
+//        }
+//    }
+//
+//    CBPeripheral *peripheral = self.peripherals[row];
+//    if (!cell) {
+//        NSLog(@"new cell");
+//        cell = [[BLDeviceInfoCell alloc] init];
+//    }
+//    NSString *name = peripheral.name;
+//
+//    name = name?name:@"unknow";
+//
+//    cell.nameLabel.text = name;
+//
+//    return cell;
+//}
+//
+//-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+//    return [BLDeviceInfoCell cellHeight];
+//}
+//
+//-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+//    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+//
+//    NSInteger row = indexPath.row;
+//    CBPeripheral *peripheral = self.peripherals[row];
+//
+//    switch (peripheral.state) {
+//        case CBPeripheralStateConnected:
+//            break;
+//        case CBPeripheralStateDisconnected:
+//            break;
+//        case CBPeripheralStateConnecting:
+//            break;
+//        case CBPeripheralStateDisconnecting:
+//            break;
+//
+//        default:
+//            break;
+//    }
+//}
 
--(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+#pragma mark - UITableViewDataSource
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
     return self.peripherals.count;
 }
 
--(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSInteger row = indexPath.row;
-    
-    BLDeviceInfoCell *cell  = [tableView dequeueReusableCellWithIdentifier:NSStringFromClass(BLDeviceInfoCell.class)];
-    
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString *identifier = @"deviceId";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
     if (cell == nil) {
-        NSArray *topLevelObjects = [[NSBundle mainBundle] loadNibNamed:NSStringFromClass(BLDeviceInfoCell.class) owner:self options:nil];
-        for (id currentObject in topLevelObjects){
-            if ([currentObject isKindOfClass:BLDeviceInfoCell.class]){
-                cell =  currentObject;
-                break;
-            }
-        }
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:identifier];
     }
     
-    CBPeripheral *peripheral = self.peripherals[row];
-    if (!cell) {
-        NSLog(@"new cell");
-        cell = [[BLDeviceInfoCell alloc] init];
+    NSDictionary *dict = [self.peripherals objectAtIndex:indexPath.row];
+    CBPeripheral *peripherral = dict[@"peripheral"];
+    cell.textLabel.text = [NSString stringWithFormat:@"名称:%@",peripherral.name];
+    cell.detailTextLabel.text = [NSString stringWithFormat:@"信号强度:%@, 距离~:%fm",dict[@"RSSI"], [[self class] RSSI2distance:[dict[@"RSSI"] floatValue]]];
+    if (peripherral.state == CBPeripheralStateConnected) {
+        cell.accessoryType = UITableViewCellAccessoryCheckmark;
+    } else {
+        cell.accessoryType = UITableViewCellAccessoryNone;
     }
-    NSString *name = peripheral.name;
-    
-    name = name?name:@"unknow";
-    
-    cell.nameLabel.text = name;
     
     return cell;
 }
 
--(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return [BLDeviceInfoCell cellHeight];
-}
-
--(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+//    NSDictionary *dict = [self.peripherals objectAtIndex:indexPath.row];
+//    CBPeripheral *peripheral = dict[@"peripheral"];
     
-    NSInteger row = indexPath.row;
-    CBPeripheral *peripheral = self.peripherals[row];
-    
-    switch (peripheral.state) {
-        case CBPeripheralStateConnected:
-            break;
-        case CBPeripheralStateDisconnected:
-            break;
-        case CBPeripheralStateConnecting:
-            break;
-        case CBPeripheralStateDisconnecting:
-            break;
-            
-        default:
-            break;
-    }
+//    BLEDetailViewController *detailVC = [self.storyboard instantiateViewControllerWithIdentifier:@"BLEDetailViewController"];
+//    detailVC.perpheral = peripheral;
+//    [self.navigationController pushViewController:detailVC animated:YES];
 }
 
 #pragma mark - CBCentralManagerDelegate
@@ -229,7 +336,8 @@ id dataToArrayBuffer(NSData* data)
             NSLog(@"蓝牙可用");
             // 根据SERVICE_UUID来扫描外设，如果不设置SERVICE_UUID，则扫描所有蓝牙设备
 //            [central scanForPeripheralsWithServices:@[[CBUUID UUIDWithString:TEST_SERVICE_UUID]] options:nil];
-            [central scanForPeripheralsWithServices:@[[CBUUID UUIDWithString:SERVICE_UUID]] options:nil];
+//            [central scanForPeripheralsWithServices:@[[CBUUID UUIDWithString:SERVICE_UUID]] options:nil];
+            [central scanForPeripheralsWithServices:nil options:nil];
         }
     } else {
         // Fallback on earlier versions
@@ -260,7 +368,9 @@ id dataToArrayBuffer(NSData* data)
     }
     
     // 连接外设
-    [central connectPeripheral:peripheral options:nil];
+//    [central connectPeripheral:peripheral options:nil];
+    
+    [self addPeripheral:peripheral RSSI:RSSI];
 }
 
 /** 连接成功 */
