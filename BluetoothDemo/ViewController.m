@@ -76,13 +76,20 @@
 
 #pragma mark - peripherals handlers
 
--(void)addPeripheral:(CBPeripheral *)peripheral RSSI:(NSNumber *)RSSI {
-//    if (peripheral.name.length <= 0) {
-//        return ;
-//    }
+-(void)addPeripheral:(CBPeripheral *)peripheral RSSI:(NSNumber *)RSSI name:(NSString *)name {
+    if (peripheral.name.length <= 0 || !name) {
+        return ;
+    }
+    if(!name) {
+        name = peripheral.name;
+    }
+    
+    if (!name) {
+        name = @"no";
+    }
     
     if (self.peripherals.count == 0) {
-        NSDictionary *dict = @{@"peripheral":peripheral, @"RSSI":RSSI};
+        NSDictionary *dict = @{@"peripheral":peripheral, @"RSSI":RSSI, @"name": name};
         [self.peripherals addObject:dict];
     } else {
         BOOL isExist = NO;
@@ -91,20 +98,56 @@
             CBPeripheral *per = dict[@"peripheral"];
             if ([per.identifier.UUIDString isEqualToString:peripheral.identifier.UUIDString]) {
                 isExist = YES;
-                NSDictionary *dict = @{@"peripheral":peripheral, @"RSSI":RSSI};
+                NSDictionary *dict = @{@"peripheral":peripheral, @"RSSI":RSSI, @"name": name};
                 [self.peripherals replaceObjectAtIndex:i withObject:dict];
             }
         }
         
         if (!isExist) {
-            NSDictionary *dict = @{@"peripheral":peripheral, @"RSSI":RSSI};
+            NSDictionary *dict = @{@"peripheral":peripheral, @"RSSI":RSSI, @"name": name};
             [self.peripherals addObject:dict];
         }
     }
     
-    NSLog(@"%@", self.peripherals);
+//    NSLog(@"%@", self.peripherals);
     
     [self.myTableView reloadData];
+}
+
++(NSArray *)ownProperties:(CBCharacteristicProperties)properties {
+    NSMutableArray *arr = [NSMutableArray new];
+    if(properties & CBCharacteristicPropertyBroadcast) {
+        [arr addObject:@"Broadcast"];
+    }
+    if(properties & CBCharacteristicPropertyRead) {
+        [arr addObject:@"Read"];
+    }
+    if(properties & CBCharacteristicPropertyWriteWithoutResponse) {
+        [arr addObject:@"WriteWithoutResponse"];
+    }
+    if(properties & CBCharacteristicPropertyWrite) {
+        [arr addObject:@"Write"];
+    }
+    if(properties & CBCharacteristicPropertyNotify) {
+        [arr addObject:@"Notify"];
+    }
+    if(properties & CBCharacteristicPropertyIndicate) {
+        [arr addObject:@"Indicate"];
+    }
+    if(properties & CBCharacteristicPropertyAuthenticatedSignedWrites) {
+        [arr addObject:@"AuthenticatedSignedWrites"];
+    }
+    if(properties & CBCharacteristicPropertyExtendedProperties) {
+        [arr addObject:@"ExtendedProperties"];
+    }
+    if(properties & CBCharacteristicPropertyNotifyEncryptionRequired) {
+        [arr addObject:@"NotifyEncryptionRequired"];
+    }
+    if(properties & CBCharacteristicPropertyIndicateEncryptionRequired) {
+        [arr addObject:@"IndicateEncryptionRequired"];
+    }
+    
+    return [arr copy];
 }
 
 #pragma mark - util methods
@@ -304,10 +347,10 @@ id dataToArrayBuffer(NSData* data)
     }
     
     NSDictionary *dict = [self.peripherals objectAtIndex:indexPath.row];
-    CBPeripheral *peripherral = dict[@"peripheral"];
-    cell.textLabel.text = [NSString stringWithFormat:@"名称:%@",peripherral.name];
+    CBPeripheral *peripheral = dict[@"peripheral"];
+    cell.textLabel.text = [NSString stringWithFormat:@"名称:%@, name:%@", peripheral.name, dict[@"name"]];
     cell.detailTextLabel.text = [NSString stringWithFormat:@"信号强度:%@, 距离~:%fm",dict[@"RSSI"], [[self class] RSSI2distance:[dict[@"RSSI"] floatValue]]];
-    if (peripherral.state == CBPeripheralStateConnected) {
+    if (peripheral.state == CBPeripheralStateConnected) {
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
     } else {
         cell.accessoryType = UITableViewCellAccessoryNone;
@@ -319,8 +362,9 @@ id dataToArrayBuffer(NSData* data)
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-//    NSDictionary *dict = [self.peripherals objectAtIndex:indexPath.row];
-//    CBPeripheral *peripheral = dict[@"peripheral"];
+    NSDictionary *dict = [self.peripherals objectAtIndex:indexPath.row];
+    CBPeripheral *peripheral = dict[@"peripheral"];
+    [self.centralManager connectPeripheral:peripheral options:nil];
     
 //    BLEDetailViewController *detailVC = [self.storyboard instantiateViewControllerWithIdentifier:@"BLEDetailViewController"];
 //    detailVC.perpheral = peripheral;
@@ -339,7 +383,8 @@ id dataToArrayBuffer(NSData* data)
 //            [central scanForPeripheralsWithServices:@[[CBUUID UUIDWithString:SERVICE_UUID]] options:nil];
             [central scanForPeripheralsWithServices:nil options:nil];
         }
-    } else {
+    } else if(central.state == CBCentralManagerStatePoweredOn) {
+        [central scanForPeripheralsWithServices:nil options:nil];
         // Fallback on earlier versions
     }
     if(central.state==CBCentralManagerStateUnsupported) {
@@ -362,15 +407,18 @@ id dataToArrayBuffer(NSData* data)
     //        [central connectPeripheral:peripheral options:nil];
     //    }
     NSLog(@"advertisementData:%@", advertisementData);
-    NSData *mfgData = [advertisementData objectForKey:CBAdvertisementDataManufacturerDataKey];
-    if (mfgData) {
-        NSLog(@"%@", dataToArrayBuffer(mfgData));
-    }
+//    NSData *mfgData = [advertisementData objectForKey:CBAdvertisementDataManufacturerDataKey];
+//    if (mfgData) {
+//        NSLog(@"mfgData:%@", dataToArrayBuffer(mfgData));
+//    }
     
+    NSString *localName = [advertisementData objectForKey:CBAdvertisementDataLocalNameKey];
+    
+    NSLog(@"localName:%@", localName);
     // 连接外设
 //    [central connectPeripheral:peripheral options:nil];
     
-    [self addPeripheral:peripheral RSSI:RSSI];
+    [self addPeripheral:peripheral RSSI:RSSI name:localName];
 }
 
 /** 连接成功 */
@@ -380,7 +428,8 @@ id dataToArrayBuffer(NSData* data)
     // 设置代理
     peripheral.delegate = self;
     // 根据UUID来寻找服务
-    [peripheral discoverServices:@[[CBUUID UUIDWithString:SERVICE_UUID]]];
+//    [peripheral discoverServices:@[[CBUUID UUIDWithString:SERVICE_UUID]]];
+    [peripheral discoverServices:nil];
     NSLog(@"连接成功");
 }
 
@@ -411,43 +460,49 @@ id dataToArrayBuffer(NSData* data)
 //    readValueForCharacteristic方法是直接读一次这个特征上的数据。
     
     // 这里仅有一个服务，所以直接获取
-    CBService *service = peripheral.services.lastObject;
-    if(!service) {
-        NSLog(@"no service");
-        return;
+//    CBService *service = peripheral.services.lastObject;
+//    if(!service) {
+//        NSLog(@"no service");
+//        return;
+//    }
+//    // 根据UUID寻找服务中的特征
+//    [peripheral discoverCharacteristics:@[[CBUUID UUIDWithString:CHARACTERISTIC_READ_UUID], [CBUUID UUIDWithString:CHARACTERISTIC_WRITE_UUID]] forService:service];
+    for (CBService *service in peripheral.services) {
+        [peripheral discoverCharacteristics:nil forService:service];
     }
-    // 根据UUID寻找服务中的特征
-    [peripheral discoverCharacteristics:@[[CBUUID UUIDWithString:CHARACTERISTIC_READ_UUID], [CBUUID UUIDWithString:CHARACTERISTIC_WRITE_UUID]] forService:service];
 }
 
 /** 发现特征回调 */
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error {
-    
     // 遍历出所需要的特征
     for (CBCharacteristic *characteristic in service.characteristics) {
         NSLog(@"所有特征：%@", characteristic);
+        NSLog(@"properties: 0x%lx, %lu", (unsigned long)characteristic.properties, characteristic.properties);
+        NSLog(@"%@", [[self class] ownProperties:characteristic.properties]);
+//        NSLog(@"description: %@", characteristic.description);
+//        NSLog(@"descriptors: %@", characteristic.descriptors);
         // 从外设开发人员那里拿到不同特征的UUID，不同特征做不同事情，比如有读取数据的特征，也有写入数据的特征
         
-        if([characteristic.UUID.UUIDString isEqualToString:CHARACTERISTIC_READ_UUID]) {
-            self.characteristicRead = characteristic;
-        }
-        else if([characteristic.UUID.UUIDString isEqualToString:CHARACTERISTIC_WRITE_UUID]) {
-            self.characteristicWrite = characteristic;
-        }
+//        if([characteristic.UUID.UUIDString isEqualToString:CHARACTERISTIC_READ_UUID]) {
+//            self.characteristicRead = characteristic;
+//        }
+//        else if([characteristic.UUID.UUIDString isEqualToString:CHARACTERISTIC_WRITE_UUID]) {
+//            self.characteristicWrite = characteristic;
+//        }
     }
     
     // 这里只获取一个特征，写入数据的时候需要用到这个特征
 //    self.characteristic = service.characteristics.lastObject;
 //
-    if(!self.characteristicWrite || !self.characteristicRead) {
-        NSLog(@"no characteristic");
-        return;
-    }
+//    if(!self.characteristicWrite || !self.characteristicRead) {
+//        NSLog(@"no characteristic");
+//        return;
+//    }
 //    // 直接读取这个特征数据，会调用didUpdateValueForCharacteristic
-    [peripheral readValueForCharacteristic:self.characteristicRead];
+//    [peripheral readValueForCharacteristic:self.characteristicRead];
 //
 //    // 订阅通知
-    [peripheral setNotifyValue:YES forCharacteristic:self.characteristicRead];
+//    [peripheral setNotifyValue:YES forCharacteristic:self.characteristicRead];
 //    [peripheral setNotifyValue:YES forCharacteristic:self.characteristicWrite];
 }
 

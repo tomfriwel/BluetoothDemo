@@ -108,14 +108,37 @@
  CBManagerStatePoweredOn,    可用
  */
 - (void)peripheralManagerDidUpdateState:(CBPeripheralManager *)peripheral {
-    if (peripheral.state == CBManagerStatePoweredOn) {
-        // 创建Service（服务）和Characteristics（特征）
-        [self setupServiceAndCharacteristics];
-        // 根据服务的UUID开始广播
-        [self.peripheralManager startAdvertising:@{CBAdvertisementDataServiceUUIDsKey:@[[CBUUID UUIDWithString:SERVICE_UUID]], CBAdvertisementDataLocalNameKey:@"Test tomfriwel"}];
-    }
-    else {
-        [ViewController showAlert:@"请检查蓝牙是否开启"];
+    if (@available(macOS 10.13, *)) {
+        if (peripheral.state == CBManagerStatePoweredOn) {
+            // 创建Service（服务）和Characteristics（特征）
+            [self setupServiceAndCharacteristics];
+            // 根据服务的UUID开始广播
+            
+//            CBAdvertisementDataLocalNameKey NSString
+//            CBAdvertisementDataTxPowerLevelKey  NSNumber
+//            CBAdvertisementDataServiceUUIDsKey CBUUID
+//            CBAdvertisementDataServiceDataKey CBService
+//            CBAdvertisementDataManufacturerDataKey NSData
+//            CBAdvertisementDataOverflowServiceUUIDsKey CBUUID
+//            CBAdvertisementDataIsConnectable NSNumber
+//            CBAdvertisementDataSolicitedServiceUUIDsKey CBUUID
+            
+            NSData *data = [@"abc" dataUsingEncoding:NSUTF8StringEncoding];
+
+            [self.peripheralManager startAdvertising:
+             @{
+               CBAdvertisementDataServiceUUIDsKey:@[[CBUUID UUIDWithString:SERVICE_UUID]],
+               CBAdvertisementDataLocalNameKey:@"Test tomfriwel",
+//               CBAdvertisementDataTxPowerLevelKey: [NSNumber numberWithInt:123],
+//               CBAdvertisementDataManufacturerDataKey: data,
+//               CBAdvertisementDataIsConnectable: [NSNumber numberWithBool:YES]
+               }];
+        }
+        else {
+            [ViewController showAlert:@"请检查蓝牙是否开启"];
+        }
+    } else {
+        // Fallback on earlier versions
     }
 }
 

@@ -11,4 +11,7 @@
 
 @interface WelBLECentralManager : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate>
 
+@property (nonatomic, strong) CBCentralManager *centralManager;
+@property (nonatomic, strong) NSMutableArray *peripherals;
+
 @end

@@ -10,6 +10,56 @@
 
 @implementation WelBLECentralManager
 
+#pragma mark - get property
+
+-(NSMutableArray *)peripherals {
+    if(!_peripherals) {
+        _peripherals = [[NSMutableArray alloc] init];
+    }
+    return _peripherals;
+}
+
+-(CBCentralManager *)centralManager {
+    if (!_centralManager) {
+        // Create a central device manager and call back `centralManagerDidUpdateState`
+        _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:dispatch_get_main_queue()];
+    }
+    return _centralManager;
+}
+
+#pragma mark - handler
+
+-(void)addPeripheral:(CBPeripheral *)peripheral RSSI:(NSNumber *)RSSI {
+    if (peripheral.name.length <= 0) {
+        return;
+    }
+    
+    if (self.peripherals.count == 0) {
+        NSDictionary *dict = @{@"peripheral":peripheral, @"RSSI":RSSI};
+        [self.peripherals addObject:dict];
+    } else {
+        BOOL isExist = NO;
+        for (int i = 0; i < self.peripherals.count; i++) {
+            NSDictionary *dict = [self.peripherals objectAtIndex:i];
+            CBPeripheral *per = dict[@"peripheral"];
+            if ([per.identifier.UUIDString isEqualToString:peripheral.identifier.UUIDString]) {
+                isExist = YES;
+                NSDictionary *dict = @{@"peripheral":peripheral, @"RSSI":RSSI};
+                [self.peripherals replaceObjectAtIndex:i withObject:dict];
+            }
+        }
+        
+        if (!isExist) {
+            NSDictionary *dict = @{@"peripheral":peripheral, @"RSSI":RSSI};
+            [self.peripherals addObject:dict];
+        }
+    }
+    
+    //    if (self.peripheralsDidChangeBlock) {
+    //        self.peripheralsDidChangeBlock([NSArray arrayWithArray:self.peripherals]);
+    //    }
+}
+
 #pragma mark - CBCentralManagerDelegate
 
 - (void)centralManagerDidUpdateState:(CBCentralManager *)central {
@@ -21,7 +71,7 @@
 }
 
 - (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary<NSString *, id> *)advertisementData RSSI:(NSNumber *)RSSI {
-    
+    [self addPeripheral:peripheral RSSI:RSSI];
 }
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral {
