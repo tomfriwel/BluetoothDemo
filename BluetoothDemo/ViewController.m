@@ -356,6 +356,10 @@ id dataToArrayBuffer(NSData* data)
         cell.accessoryType = UITableViewCellAccessoryNone;
     }
     
+    if (peripheral.state == CBPeripheralStateConnected) {
+        cell.backgroundColor = [UIColor colorWithRed:0.47 green:0.77 blue:0.95 alpha:1.00];
+    }
+    
     return cell;
 }
 
@@ -364,6 +368,9 @@ id dataToArrayBuffer(NSData* data)
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     NSDictionary *dict = [self.peripherals objectAtIndex:indexPath.row];
     CBPeripheral *peripheral = dict[@"peripheral"];
+    if (peripheral.state == CBPeripheralStateConnected) {
+        [self.centralManager cancelPeripheralConnection:peripheral];
+    }
     [self.centralManager connectPeripheral:peripheral options:nil];
     
 //    BLEDetailViewController *detailVC = [self.storyboard instantiateViewControllerWithIdentifier:@"BLEDetailViewController"];
@@ -431,6 +438,8 @@ id dataToArrayBuffer(NSData* data)
 //    [peripheral discoverServices:@[[CBUUID UUIDWithString:SERVICE_UUID]]];
     [peripheral discoverServices:nil];
     NSLog(@"连接成功");
+    
+    [self.myTableView reloadData];
 }
 
 /** 连接失败的回调 */
@@ -443,6 +452,8 @@ id dataToArrayBuffer(NSData* data)
     NSLog(@"断开连接");
     // 断开连接可以设置重新连接
     [central connectPeripheral:peripheral options:nil];
+    
+    [self.myTableView reloadData];
 }
 
 #pragma mark - CBPeripheralDelegate
@@ -489,6 +500,10 @@ id dataToArrayBuffer(NSData* data)
 //        else if([characteristic.UUID.UUIDString isEqualToString:CHARACTERISTIC_WRITE_UUID]) {
 //            self.characteristicWrite = characteristic;
 //        }
+        
+        if (characteristic.properties & CBCharacteristicPropertyWrite) {
+            self.characteristicWrite = characteristic;
+        }
     }
     
     // 这里只获取一个特征，写入数据的时候需要用到这个特征
@@ -504,6 +519,9 @@ id dataToArrayBuffer(NSData* data)
 //    // 订阅通知
 //    [peripheral setNotifyValue:YES forCharacteristic:self.characteristicRead];
 //    [peripheral setNotifyValue:YES forCharacteristic:self.characteristicWrite];
+//    if (self.characteristicWrite) {
+//        [peripheral setNotifyValue:YES forCharacteristic:self.characteristicWrite];
+//    }
 }
 
 /** 订阅状态的改变 */
@@ -539,6 +557,5 @@ id dataToArrayBuffer(NSData* data)
     
     self.invalidatedServices = invalidatedServices;
 }
-
 
 @end

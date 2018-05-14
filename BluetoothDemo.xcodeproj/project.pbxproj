@@ -52,6 +52,9 @@
 		CF4E6E60209B02F500511C21 /* WelBLEPeripheralManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WelBLEPeripheralManager.m; sourceTree = "<group>"; };
 		CF4E6E65209BFE7000511C21 /* CentralViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CentralViewController.h; sourceTree = "<group>"; };
 		CF4E6E66209BFE7000511C21 /* CentralViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CentralViewController.m; sourceTree = "<group>"; };
+		CF4E6E68209C630F00511C21 /* liblockdown.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = liblockdown.tbd; path = usr/lib/liblockdown.tbd; sourceTree = SDKROOT; };
+		CF4E6E6B209C64D700511C21 /* libMobileGestaltExtensions.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libMobileGestaltExtensions.tbd; path = usr/lib/libMobileGestaltExtensions.tbd; sourceTree = SDKROOT; };
+		CF4E6E6C209C64D700511C21 /* libMobileGestalt.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libMobileGestalt.tbd; path = usr/lib/libMobileGestalt.tbd; sourceTree = SDKROOT; };
 		CF6CB28C1F6A24ED003D8C56 /* BluetoothDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BluetoothDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CF6CB28F1F6A24ED003D8C56 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		CF6CB2901F6A24ED003D8C56 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -169,6 +172,9 @@
 		CF6CB2C11F6A32E0003D8C56 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CF4E6E6C209C64D700511C21 /* libMobileGestalt.tbd */,
+				CF4E6E6B209C64D700511C21 /* libMobileGestaltExtensions.tbd */,
+				CF4E6E68209C630F00511C21 /* liblockdown.tbd */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

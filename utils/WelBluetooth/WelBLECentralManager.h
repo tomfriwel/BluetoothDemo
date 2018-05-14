@@ -14,4 +14,6 @@
 @property (nonatomic, strong) CBCentralManager *centralManager;
 @property (nonatomic, strong) NSMutableArray *peripherals;
 
+-(void)scan:(nullable NSArray *)uuids;
+
 @end
